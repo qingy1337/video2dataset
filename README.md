@@ -12,13 +12,7 @@ If you would like to contribute to video2dataset, please read [CONTRIBUTE.md](CO
 ## Install
 
 ```bash
-pip install video2dataset
-```
-
-Or from source via
-
-```bash
-git clone https://github.com/iejMac/video2dataset
+git clone https://github.com/qingy1337/video2dataset
 cd video2dataset
 pip install -e .
 ```
