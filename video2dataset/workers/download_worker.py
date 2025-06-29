@@ -188,6 +188,8 @@ class DownloadWorker:
                         "error_message": error_message,
                         "yt_meta_dict": yt_meta_dict,
                     }
+                    if isinstance(yt_meta_dict, dict) and "clips" in yt_meta_dict:
+                        meta["clips"] = yt_meta_dict.pop("clips")
 
                     if error_message is not None:
                         print(error_message)

@@ -165,6 +165,24 @@ These arguments give coarse control over input/output "shape" of the dataset. Fo
 
 If we want to download a large amount of YouTube videos with video2dataset we can specify some parameters and also extract useful metadata as well. For directions on how to do so please see this [example](https://github.com/iejMac/video2dataset/blob/main/examples/yt_metadata.md).
 
+## Downloading specific sections of YouTube videos
+
+video2dataset accepts YouTube IDs that encode a start and end time in the form
+`<video_id>_<start>_<end>` where the times are in seconds as 6 digit numbers. For
+example `BiKRPPjAzvw_000017_000027` will download the segment between 17 and 27
+seconds. When such an ID is provided as the url column, yt-dlp is instructed via
+`--download-sections` to download only that clip and the time span will be stored
+in the output metadata under `clips`.
+
+If those IDs are stored in a json file you can run:
+
+```bash
+video2dataset --url_list="clips.json" --input_format="json" \
+    --url_col="videoID" --caption_col="enCap" --output_folder="dataset"
+```
+
+where `clips.json` is a list of dictionaries with keys `videoID` and `enCap`.
+
 ## Incremental mode
 
 If a first download got interrupted for any reason, you can run again with --incremental "incremental" (this is the default) and using the same output folder , the same number_sample_per_shard and the same input urls, and video2dataset will complete the download.
