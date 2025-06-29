@@ -174,6 +174,15 @@ seconds. When such an ID is provided as the url column, yt-dlp is instructed via
 `--download-sections` to download only that clip and the time span will be stored
 in the output metadata under `clips`.
 
+If those IDs are stored in a json file you can run:
+
+```bash
+video2dataset --url_list="clips.json" --input_format="json" \
+    --url_col="videoID" --caption_col="enCap" --output_folder="dataset"
+```
+
+where `clips.json` is a list of dictionaries with keys `videoID` and `enCap`.
+
 ## Incremental mode
 
 If a first download got interrupted for any reason, you can run again with --incremental "incremental" (this is the default) and using the same output folder , the same number_sample_per_shard and the same input urls, and video2dataset will complete the download.
