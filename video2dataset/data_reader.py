@@ -181,6 +181,13 @@ class YtDlpDownloader:
 
     def __call__(self, url):
         modality_paths = {}
+        clip_span = None
+
+        match = re.match(r"^([\w-]{11})_(\d{6})_(\d{6})$", url)
+        if match:
+            video_id, s, e = match.groups()
+            clip_span = (int(s), int(e))
+            url = f"https://www.youtube.com/watch?v={video_id}"
 
         video_format_string = (
             f"wv*[height>={self.video_size}][ext=mp4]{'[codec=avc1]' if self.specify_codec else ''}/"
@@ -198,6 +205,9 @@ class YtDlpDownloader:
                 "format": audio_fmt_string,
                 "quiet": True,
             }
+            if clip_span is not None:
+                ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
+                ydl_opts["force_keyframes_at_cuts"] = True
 
             err = None
             try:
@@ -222,6 +232,9 @@ class YtDlpDownloader:
                 "quiet": True,
                 "no_warnings": True,
             }
+            if clip_span is not None:
+                ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
+                ydl_opts["force_keyframes_at_cuts"] = True
 
             err = None
             try:
@@ -243,6 +256,9 @@ class YtDlpDownloader:
         except Exception as e:  # pylint: disable=(broad-except)
             err = str(e)
             yt_meta_dict = {}
+
+        if clip_span is not None:
+            yt_meta_dict["clips"] = [[clip_span[0], clip_span[1]]]
 
         return modality_paths, yt_meta_dict, None
 
