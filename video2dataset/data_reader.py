@@ -209,7 +209,7 @@ class YtDlpDownloader:
                 "quiet": True,
             }
             if self.cookies_file:
-                ydl_opts["cookiefile"] = self.cookies_file
+                ydl_opts["cookies"] = self.cookies_file
             if clip_span is not None:
                 ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
                 ydl_opts["force_keyframes_at_cuts"] = True
@@ -242,7 +242,7 @@ class YtDlpDownloader:
                 "no_warnings": True,
             }
             if self.cookies_file:
-                ydl_opts["cookiefile"] = self.cookies_file
+                ydl_opts["cookies"] = self.cookies_file
             if clip_span is not None:
                 ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
                 ydl_opts["force_keyframes_at_cuts"] = True
