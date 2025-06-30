@@ -4,6 +4,7 @@ import os
 import uuid
 import requests
 import yt_dlp
+from yt_dlp.utils import download_range_func
 import io
 import webvtt
 import ffmpeg
@@ -180,18 +181,15 @@ class YtDlpDownloader:
         self.encode_formats = encode_formats
 
         if isinstance(cookies_file, str):
-            cookies_list = [c.strip() for c in cookies_file.split(",") if c.strip()]
+            self.cookie_files = [c.strip() for c in cookies_file.split(",") if c.strip()]
         elif isinstance(cookies_file, list):
-            cookies_list = cookies_file
+            self.cookie_files = list(cookies_file)
+        elif cookies_file:
+            self.cookie_files = [cookies_file]
         else:
-            cookies_list = [cookies_file] if cookies_file else []
+            self.cookie_files = []
 
-        if cookies_list:
-            self.cookie_cycle = itertools.cycle(cookies_list)
-            self.cookie_cycle_lock = Lock()
-        else:
-            self.cookie_cycle = None
-            self.cookie_cycle_lock = None
+        self.cookie_index = 0
 
         # TODO: figure out when to do this
         # was relevant with HD videos for loading with decord
@@ -219,9 +217,9 @@ class YtDlpDownloader:
         )
 
         cookie_file = None
-        if self.cookie_cycle is not None:
-            with self.cookie_cycle_lock:
-                cookie_file = next(self.cookie_cycle)
+        if self.cookie_files:
+            cookie_file = self.cookie_files[self.cookie_index % len(self.cookie_files)]
+            self.cookie_index += 1
 
         if self.encode_formats.get("audio", None):
             audio_path_m4a = f"{self.tmp_dir}/{str(uuid.uuid4())}.m4a"
@@ -233,7 +231,7 @@ class YtDlpDownloader:
             if cookie_file:
                 ydl_opts["cookiefile"] = cookie_file
             if clip_span is not None:
-                ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
+                ydl_opts["download_ranges"] = download_range_func(None, [(clip_span[0], clip_span[1])])
                 ydl_opts["force_keyframes_at_cuts"] = True
 
             err = None
@@ -266,7 +264,7 @@ class YtDlpDownloader:
             if cookie_file:
                 ydl_opts["cookiefile"] = cookie_file
             if clip_span is not None:
-                ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
+                ydl_opts["download_ranges"] = download_range_func(None, [(clip_span[0], clip_span[1])])
                 ydl_opts["force_keyframes_at_cuts"] = True
 
             err = None

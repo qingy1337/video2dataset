@@ -165,8 +165,8 @@ If we want to download a large amount of YouTube videos with video2dataset we ca
 video2dataset accepts YouTube IDs that encode a start and end time in the form
 `<video_id>_<start>_<end>` where the times are in seconds as 6 digit numbers. For
 example `BiKRPPjAzvw_000017_000027` will download the segment between 17 and 27
-seconds. When such an ID is provided as the url column, yt-dlp is instructed via
-`--download-sections` to download only that clip and the time span will be stored
+seconds. When such an ID is provided as the url column, yt-dlp uses
+`download_range_func` to download only that clip and the time span will be stored
 in the output metadata under `clips`.
 
 If those IDs are stored in a json file you can run:
