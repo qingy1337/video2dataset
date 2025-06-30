@@ -216,6 +216,7 @@ class YtDlpDownloader:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
                     ydl.download(url)
             except Exception as e:  # pylint: disable=(broad-except)
+                print(f"video2dataset error: {err}")
                 err = str(e)
                 os.remove(audio_path_m4a)
 
@@ -244,6 +245,7 @@ class YtDlpDownloader:
                     ydl.download(url)
             except Exception as e:  # pylint: disable=(broad-except)
                 err = str(e)
+                print(f"video2dataset error: {err}")
                 os.remove(video_path)
 
             if err is None:
