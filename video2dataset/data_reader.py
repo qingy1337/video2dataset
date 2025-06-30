@@ -9,6 +9,8 @@ import io
 import webvtt
 import ffmpeg
 import re
+import itertools
+from threading import Lock
 
 
 def video2audio(video, audio_format, tmp_dir):
