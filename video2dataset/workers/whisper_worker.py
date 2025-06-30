@@ -52,6 +52,7 @@ class WhisperWorker:
         encode_formats,
         is_slurm_task,
         config,
+        cookies_file=None,
     ) -> None:
         self.sample_writer_class = sample_writer_class
         self.output_folder = output_folder
@@ -60,7 +61,9 @@ class WhisperWorker:
         self.save_caption = False
         self.config = config
 
-        self.data_reader = VideoDataReader(encode_formats, tmp_dir, config["reading"])
+        self.data_reader = VideoDataReader(
+            encode_formats, tmp_dir, config["reading"], cookies_file=cookies_file
+        )
 
         if config["distribution"]["distributor"] != "slurm":
             self.whisper_subsampler = WhisperSubsampler(
