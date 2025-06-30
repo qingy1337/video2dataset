@@ -227,9 +227,8 @@ class YtDlpDownloader:
                 "outtmpl": audio_path_m4a,
                 "format": audio_fmt_string,
                 "quiet": True,
+                "cookiesfrombrowser": "chrome",
             }
-            if cookie_file:
-                ydl_opts["cookiefile"] = cookie_file
             if clip_span is not None:
                 ydl_opts["download_ranges"] = download_range_func(None, [(clip_span[0], clip_span[1])])
                 ydl_opts["force_keyframes_at_cuts"] = True
@@ -260,9 +259,8 @@ class YtDlpDownloader:
                 "format": video_format_string,
                 "quiet": True,
                 "no_warnings": True,
+                "cookiesfrombrowser": "chrome",
             }
-            if cookie_file:
-                ydl_opts["cookiefile"] = cookie_file
             if clip_span is not None:
                 ydl_opts["download_ranges"] = download_range_func(None, [(clip_span[0], clip_span[1])])
                 ydl_opts["force_keyframes_at_cuts"] = True
