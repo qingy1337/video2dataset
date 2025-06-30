@@ -150,7 +150,7 @@ incremental_mode: Decides how to handle restarting, Can be (default = "increment
     - overwrite, deletes and reprocesses shards as it goes
 max_shard_retry: Maximum amount of attempts to retry a failed shard (default = 1)
 tmp_dir: Path to temporary directory on your file system (default = "/tmp")
-cookies_file: Path to cookies.txt file passed to yt-dlp (default = None)
+cookies_file: Comma separated paths to cookies.txt files passed to yt-dlp. When multiple are provided they are used in rotation (default = None)
 config: Path to your config of choice or the config itself (more info on configs in API doc) (default = "default")
 ```
 
