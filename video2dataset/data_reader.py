@@ -6,6 +6,7 @@ import yt_dlp
 import io
 import webvtt
 import ffmpeg
+import re
 
 
 def video2audio(video, audio_format, tmp_dir):
