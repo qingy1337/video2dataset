@@ -214,13 +214,16 @@ class YtDlpDownloader:
             err = None
             try:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    ydl.download(url)
+                    ret_code = ydl.download(url)
+                if ret_code != 0 or not os.path.exists(audio_path_m4a):
+                    err = f"yt-dlp exited with status {ret_code}"
             except Exception as e:  # pylint: disable=(broad-except)
-                print(f"video2dataset error: {err}")
                 err = str(e)
-                os.remove(audio_path_m4a)
-
-            if err is None:
+            if err is not None:
+                print(f"video2dataset error: {err}")
+                if os.path.exists(audio_path_m4a):
+                    os.remove(audio_path_m4a)
+            else:
                 # TODO: look into this, don't think we can just do this
                 # TODO: just figure out a way to download the preferred extension using yt-dlp
                 # audio_path = audio_path_m4a.replace(".m4a", f".{self.encode_formats['audio']}")
@@ -242,13 +245,16 @@ class YtDlpDownloader:
             err = None
             try:
                 with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                    ydl.download(url)
+                    ret_code = ydl.download(url)
+                if ret_code != 0 or not os.path.exists(video_path):
+                    err = f"yt-dlp exited with status {ret_code}"
             except Exception as e:  # pylint: disable=(broad-except)
                 err = str(e)
+            if err is not None:
                 print(f"video2dataset error: {err}")
-                os.remove(video_path)
-
-            if err is None:
+                if os.path.exists(video_path):
+                    os.remove(video_path)
+            else:
                 modality_paths["video"] = video_path
 
         err = None
