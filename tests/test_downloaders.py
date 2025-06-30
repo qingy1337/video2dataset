@@ -21,7 +21,7 @@ def test_yt_downloader(modalities, video_size, url):
     encode_formats = dict([(modality, full_encode_formats[modality]) for modality in modalities])
     yt_args = {"download_size": video_size, "yt_metadata_args": None}
 
-    ytdlp_downloader = YtDlpDownloader(encode_formats, "/tmp", yt_args)
+    ytdlp_downloader = YtDlpDownloader(yt_args, "/tmp", encode_formats)
 
     modality_paths, yt_meta_dict, error_message = ytdlp_downloader(url)
     assert error_message is None

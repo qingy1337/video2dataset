@@ -169,12 +169,13 @@ class YtDlpDownloader:
     """
 
     # TODO: maybe we just include height and width in the metadata_args
-    def __init__(self, yt_args, tmp_dir, encode_formats):
+    def __init__(self, yt_args, tmp_dir, encode_formats, cookies_file=None):
         self.metadata_args = yt_args.get("yt_metadata_args", {})
         self.video_size = yt_args.get("download_size", 360)
         self.audio_rate = yt_args.get("download_audio_rate", 44100)
         self.tmp_dir = tmp_dir
         self.encode_formats = encode_formats
+        self.cookies_file = cookies_file
 
         # TODO: figure out when to do this
         # was relevant with HD videos for loading with decord
@@ -207,6 +208,8 @@ class YtDlpDownloader:
                 "format": audio_fmt_string,
                 "quiet": True,
             }
+            if self.cookies_file:
+                ydl_opts["cookies"] = self.cookies_file
             if clip_span is not None:
                 ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
                 ydl_opts["force_keyframes_at_cuts"] = True
@@ -238,6 +241,8 @@ class YtDlpDownloader:
                 "quiet": True,
                 "no_warnings": True,
             }
+            if self.cookies_file:
+                ydl_opts["cookies"] = self.cookies_file
             if clip_span is not None:
                 ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
                 ydl_opts["force_keyframes_at_cuts"] = True
@@ -276,9 +281,10 @@ class YtDlpDownloader:
 class VideoDataReader:
     """Video data reader provide data for a video"""
 
-    def __init__(self, encode_formats, tmp_dir, reading_config):
+    def __init__(self, encode_formats, tmp_dir, reading_config, cookies_file=None):
         self.webfile_downloader = WebFileDownloader(reading_config["timeout"], tmp_dir, encode_formats)
-        self.yt_downloader = YtDlpDownloader(reading_config["yt_args"], tmp_dir, encode_formats)
+        cookies = cookies_file if cookies_file is not None else reading_config.get("cookies_file")
+        self.yt_downloader = YtDlpDownloader(reading_config["yt_args"], tmp_dir, encode_formats, cookies)
 
     def __call__(self, row):
         key, url = row

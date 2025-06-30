@@ -54,6 +54,7 @@ def video2dataset(
     incremental_mode: str = "incremental",
     max_shard_retry: int = 1,
     tmp_dir: str = "/tmp",
+    cookies_file: Optional[str] = None,
     config: Any = "default",
 ):
     """
@@ -96,6 +97,7 @@ def video2dataset(
         - overwrite, deletes and reprocesses shards as it goes
     max_shard_retry: Maximum amount of attempts to retry a failed shard
     tmp_dir: Path to temporary directory on your file system
+    cookies_file: Path to cookies.txt file to pass to yt-dlp (optional)
     config: Path to your config of choice or the config itself (more info on configs in API doc)
     """
     local_args = dict(locals())
@@ -218,6 +220,7 @@ def video2dataset(
             tmp_dir=tmp_dir,
             encode_formats=encode_formats,
             config=config,
+            cookies_file=cookies_file,
         )
     elif stage == "subset":
         worker = SubsetWorker(  # type: ignore
@@ -254,6 +257,7 @@ def video2dataset(
             encode_formats=encode_formats,
             is_slurm_task=is_slurm_task,
             config=config,
+            cookies_file=cookies_file,
         )
     else:
         raise ValueError(f"Invalid stage: {stage}")

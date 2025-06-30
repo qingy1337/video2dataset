@@ -47,6 +47,7 @@ class DownloadWorker:
         tmp_dir,
         encode_formats,
         config,
+        cookies_file=None,
     ) -> None:
         self.sample_writer_class = sample_writer_class
         self.save_caption = save_caption
@@ -55,7 +56,9 @@ class DownloadWorker:
         self.encode_formats = encode_formats
         self.config = config
 
-        self.data_reader = VideoDataReader(encode_formats, tmp_dir, config["reading"])
+        self.data_reader = VideoDataReader(
+            encode_formats, tmp_dir, config["reading"], cookies_file=cookies_file
+        )
 
         self.clipping_subsampler = ClippingSubsampler(
             5,  # oom_clip_count
