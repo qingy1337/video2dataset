@@ -221,14 +221,27 @@ class YtDlpDownloader:
             cookie_file = self.cookie_files[self.cookie_index % len(self.cookie_files)]
             self.cookie_index += 1
 
+        # Correctly configure cookie options for yt-dlp
+        cookie_ydl_opts = {}
+        if cookie_file and cookie_file.lower() != "none":
+            supported_browsers = ('brave', 'chrome', 'chromium', 'edge', 'firefox', 'opera', 'safari', 'vivaldi')
+            browser_name = re.split(r'[:\+]', cookie_file, 1)[0].lower()
+            if browser_name in supported_browsers:
+                # Use cookies from browser, correctly formatted as a tuple
+                cookie_ydl_opts["cookiesfrombrowser"] = tuple(re.split(r'[:]', cookie_file, 1))
+            else:
+                # Use a cookie file
+                cookie_ydl_opts["cookiefile"] = cookie_file
+
         if self.encode_formats.get("audio", None):
             audio_path_m4a = f"{self.tmp_dir}/{str(uuid.uuid4())}.m4a"
             ydl_opts = {
                 "outtmpl": audio_path_m4a,
                 "format": audio_fmt_string,
                 "quiet": True,
-                "cookiesfrombrowser": "chrome",
             }
+            ydl_opts.update(cookie_ydl_opts) # Add cookie options
+
             if clip_span is not None:
                 ydl_opts["download_ranges"] = download_range_func(None, [(clip_span[0], clip_span[1])])
                 ydl_opts["force_keyframes_at_cuts"] = True
@@ -246,9 +259,6 @@ class YtDlpDownloader:
                 if os.path.exists(audio_path_m4a):
                     os.remove(audio_path_m4a)
             else:
-                # TODO: look into this, don't think we can just do this
-                # TODO: just figure out a way to download the preferred extension using yt-dlp
-                # audio_path = audio_path_m4a.replace(".m4a", f".{self.encode_formats['audio']}")
                 audio_path = audio_path_m4a
                 modality_paths["audio"] = audio_path
 
@@ -259,8 +269,9 @@ class YtDlpDownloader:
                 "format": video_format_string,
                 "quiet": True,
                 "no_warnings": True,
-                "cookiesfrombrowser": "chrome",
             }
+            ydl_opts.update(cookie_ydl_opts) # Add cookie options
+
             if clip_span is not None:
                 ydl_opts["download_ranges"] = download_range_func(None, [(clip_span[0], clip_span[1])])
                 ydl_opts["force_keyframes_at_cuts"] = True
