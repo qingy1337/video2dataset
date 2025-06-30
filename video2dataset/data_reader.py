@@ -1,4 +1,5 @@
 """classes and functions for downloading videos"""
+
 import os
 import uuid
 import requests
@@ -7,6 +8,8 @@ import io
 import webvtt
 import ffmpeg
 import re
+import itertools
+from threading import Lock
 
 
 def video2audio(video, audio_format, tmp_dir):
@@ -175,7 +178,20 @@ class YtDlpDownloader:
         self.audio_rate = yt_args.get("download_audio_rate", 44100)
         self.tmp_dir = tmp_dir
         self.encode_formats = encode_formats
-        self.cookies_file = cookies_file
+
+        if isinstance(cookies_file, str):
+            cookies_list = [c.strip() for c in cookies_file.split(",") if c.strip()]
+        elif isinstance(cookies_file, list):
+            cookies_list = cookies_file
+        else:
+            cookies_list = [cookies_file] if cookies_file else []
+
+        if cookies_list:
+            self.cookie_cycle = itertools.cycle(cookies_list)
+            self.cookie_cycle_lock = Lock()
+        else:
+            self.cookie_cycle = None
+            self.cookie_cycle_lock = None
 
         # TODO: figure out when to do this
         # was relevant with HD videos for loading with decord
@@ -183,6 +199,7 @@ class YtDlpDownloader:
 
     def __call__(self, url):
         import re  # ensure regex module is available in multiprocessing context
+
         modality_paths = {}
         clip_span = None
 
@@ -201,6 +218,11 @@ class YtDlpDownloader:
             f"wa[asr>={self.audio_rate}][ext=m4a] / ba[ext=m4a]" if self.audio_rate > 0 else "ba[ext=m4a]"
         )
 
+        cookie_file = None
+        if self.cookie_cycle is not None:
+            with self.cookie_cycle_lock:
+                cookie_file = next(self.cookie_cycle)
+
         if self.encode_formats.get("audio", None):
             audio_path_m4a = f"{self.tmp_dir}/{str(uuid.uuid4())}.m4a"
             ydl_opts = {
@@ -208,8 +230,8 @@ class YtDlpDownloader:
                 "format": audio_fmt_string,
                 "quiet": True,
             }
-            if self.cookies_file:
-                ydl_opts["cookiefile"] = self.cookies_file
+            if cookie_file:
+                ydl_opts["cookiefile"] = cookie_file
             if clip_span is not None:
                 ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
                 ydl_opts["force_keyframes_at_cuts"] = True
@@ -241,8 +263,8 @@ class YtDlpDownloader:
                 "quiet": True,
                 "no_warnings": True,
             }
-            if self.cookies_file:
-                ydl_opts["cookiefile"] = self.cookies_file
+            if cookie_file:
+                ydl_opts["cookiefile"] = cookie_file
             if clip_span is not None:
                 ydl_opts["download_sections"] = f"*{clip_span[0]}-{clip_span[1]}"
                 ydl_opts["force_keyframes_at_cuts"] = True

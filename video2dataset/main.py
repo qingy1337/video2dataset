@@ -1,4 +1,5 @@
 """Create dataset from video links and metadata."""
+
 import os
 import sys
 import signal
@@ -97,7 +98,7 @@ def video2dataset(
         - overwrite, deletes and reprocesses shards as it goes
     max_shard_retry: Maximum amount of attempts to retry a failed shard
     tmp_dir: Path to temporary directory on your file system
-    cookies_file: Path to cookies.txt file to pass to yt-dlp (optional)
+    cookies_file: Comma separated paths to cookies.txt files to pass to yt-dlp. If multiple are given, they are rotated between downloads (optional)
     config: Path to your config of choice or the config itself (more info on configs in API doc)
     """
     local_args = dict(locals())
