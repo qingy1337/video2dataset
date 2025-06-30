@@ -181,6 +181,7 @@ class YtDlpDownloader:
         self.specify_codec = False
 
     def __call__(self, url):
+        import re  # ensure regex module is available in multiprocessing context
         modality_paths = {}
         clip_span = None
 
